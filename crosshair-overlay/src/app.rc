@@ -1,0 +1,119 @@
+#include <windows.h>
+#include <commctrl.h>
+#include "resource.h"
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+IDI_APP     ICON "../res/crosshair.ico"
+IDI_APP_OFF ICON "../res/crosshair_off.ico"
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "app.manifest"
+
+// Slider row: label | trackbar | number box.
+//   left column:  label x=15, trackbar x=62,  edit x=136
+//   right column: label x=181, trackbar x=228, edit x=302
+
+IDD_SETTINGS DIALOGEX 0, 0, 340, 292
+STYLE DS_SETFONT | DS_CENTER | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Crosshair Overlay - Settings"
+FONT 9, "Segoe UI", 400, 0, 0x1
+BEGIN
+    // ---------------- Left column ----------------
+    GROUPBOX        "Cross lines", IDC_STATIC, 7, 4, 160, 92
+    AUTOCHECKBOX    "Show lines", IDC_SHOW_CROSS, 15, 16, 64, 10
+    AUTOCHECKBOX    "T-style (no top arm)", IDC_TSTYLE, 80, 16, 84, 10
+    LTEXT           "Length", IDC_LENGTH, 15, 32, 46, 8
+    CONTROL         "", IDC_LENGTH+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 30, 72, 12
+    EDITTEXT        IDC_LENGTH+2, 136, 30, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+    LTEXT           "Thickness", IDC_THICK, 15, 47, 46, 8
+    CONTROL         "", IDC_THICK+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 45, 72, 12
+    EDITTEXT        IDC_THICK+2, 136, 45, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+    LTEXT           "Gap", IDC_GAP, 15, 62, 46, 8
+    CONTROL         "", IDC_GAP+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 60, 72, 12
+    EDITTEXT        IDC_GAP+2, 136, 60, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+    LTEXT           "Rotation", IDC_ROT, 15, 77, 46, 8
+    CONTROL         "", IDC_ROT+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 75, 72, 12
+    EDITTEXT        IDC_ROT+2, 136, 75, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+
+    GROUPBOX        "Center dot", IDC_STATIC, 7, 100, 160, 46
+    AUTOCHECKBOX    "Show dot", IDC_SHOW_DOT, 15, 112, 64, 10
+    AUTOCHECKBOX    "Round", IDC_DOT_ROUND, 80, 112, 84, 10
+    LTEXT           "Size", IDC_DOT, 15, 128, 46, 8
+    CONTROL         "", IDC_DOT+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 126, 72, 12
+    EDITTEXT        IDC_DOT+2, 136, 126, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+
+    GROUPBOX        "Circle", IDC_STATIC, 7, 150, 160, 62
+    AUTOCHECKBOX    "Show circle", IDC_SHOW_CIRCLE, 15, 162, 120, 10
+    LTEXT           "Radius", IDC_RADIUS, 15, 178, 46, 8
+    CONTROL         "", IDC_RADIUS+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 176, 72, 12
+    EDITTEXT        IDC_RADIUS+2, 136, 176, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+    LTEXT           "Thickness", IDC_CTHICK, 15, 193, 46, 8
+    CONTROL         "", IDC_CTHICK+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 191, 72, 12
+    EDITTEXT        IDC_CTHICK+2, 136, 191, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+
+    GROUPBOX        "Position offset (pixels)", IDC_STATIC, 7, 216, 160, 46
+    LTEXT           "Horizontal", IDC_OFFX, 15, 230, 46, 8
+    CONTROL         "", IDC_OFFX+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 228, 72, 12
+    EDITTEXT        IDC_OFFX+2, 136, 228, 24, 12, ES_AUTOHSCROLL
+    LTEXT           "Vertical", IDC_OFFY, 15, 245, 46, 8
+    CONTROL         "", IDC_OFFY+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 62, 243, 72, 12
+    EDITTEXT        IDC_OFFY+2, 136, 243, 24, 12, ES_AUTOHSCROLL
+
+    // ---------------- Right column ----------------
+    GROUPBOX        "Colors", IDC_STATIC, 173, 4, 160, 77
+    LTEXT           "Color", IDC_COLOR_LB, 181, 18, 46, 8
+    PUSHBUTTON      "", IDC_COLOR_BTN, 228, 15, 50, 14, BS_BITMAP
+    LTEXT           "Opacity (%)", IDC_OPACITY, 181, 35, 46, 8
+    CONTROL         "", IDC_OPACITY+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 228, 33, 72, 12
+    EDITTEXT        IDC_OPACITY+2, 302, 33, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+    AUTOCHECKBOX    "Outline", IDC_OUTLINE, 181, 51, 46, 10
+    PUSHBUTTON      "", IDC_OUTLINE_COLOR_BTN, 228, 49, 50, 14, BS_BITMAP
+    LTEXT           "Outline width", IDC_OTHICK, 181, 67, 46, 8
+    CONTROL         "", IDC_OTHICK+1, "msctls_trackbar32", TBS_HORZ | TBS_NOTICKS | WS_TABSTOP, 228, 65, 72, 12
+    EDITTEXT        IDC_OTHICK+2, 302, 65, 24, 12, ES_NUMBER | ES_AUTOHSCROLL
+
+    GROUPBOX        "Preview", IDC_STATIC, 173, 85, 160, 86
+    CONTROL         "", IDC_PREVIEW, "Static", SS_OWNERDRAW, 181, 97, 144, 68
+
+    GROUPBOX        "Behavior", IDC_STATIC, 173, 175, 160, 87
+    LTEXT           "Toggle hotkey", IDC_HOTKEY_LB, 181, 189, 50, 8
+    CONTROL         "", IDC_HOTKEY, "msctls_hotkey32", WS_BORDER | WS_TABSTOP, 232, 187, 94, 12
+    AUTOCHECKBOX    "Hide when the mouse cursor is hidden", IDC_HIDE_CURSOR, 181, 204, 146, 10
+    AUTOCHECKBOX    "Start with Windows", IDC_STARTUP, 181, 218, 146, 10
+    LTEXT           "The crosshair is click-through. Show or hide it with the hotkey or from the tray icon menu.",
+                    IDC_HINT, 181, 234, 146, 24
+
+    // ---------------- Bottom row ----------------
+    LTEXT           "Preset", IDC_PRESET_LB, 7, 273, 24, 8
+    COMBOBOX        IDC_PRESET, 33, 270, 110, 120, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK", IDOK, 227, 270, 50, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 283, 270, 50, 14
+END
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "Crosshair Overlay"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "CrosshairOverlay"
+            VALUE "OriginalFilename", "CrosshairOverlay.exe"
+            VALUE "ProductName", "Crosshair Overlay"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
