@@ -48,8 +48,17 @@ const CheckRow kChecks[] = {
     {IDC_DOT_ROUND, &Settings::dotRound, &Settings::showDot},
     {IDC_SHOW_CIRCLE, &Settings::showCircle, nullptr},
     {IDC_OUTLINE, &Settings::outline, nullptr},
-    {IDC_HIDE_CURSOR, &Settings::hideWhenCursorHidden, nullptr},
 };
+
+// Order must match the PositionMode enum.
+const wchar_t* const kPositionNames[] = {
+    L"Auto: mouse, or center in games",
+    L"Always follow the mouse",
+    L"Mouse, hide when cursor is hidden",
+    L"Center of the active window",
+    L"Center of the screen",
+};
+static_assert(std::size(kPositionNames) == kPosCount, "one name per PositionMode");
 
 // ---- Presets --------------------------------------------------------------
 
@@ -222,6 +231,7 @@ void LoadControls(HWND dlg) {
     }
     SendDlgItemMessageW(dlg, IDC_HOTKEY, HKM_SETHOTKEY,
                         MAKEWORD(s.hotkeyVk, ModsToHotkeyFlags(s.hotkeyMods)), 0);
+    SendDlgItemMessageW(dlg, IDC_POSMODE, CB_SETCURSEL, s.positionMode, 0);
     UpdateSwatch(dlg, IDC_COLOR_BTN, 0, s.color);
     UpdateSwatch(dlg, IDC_OUTLINE_COLOR_BTN, 1, s.outlineColor);
     UpdateEnabledState(dlg);
@@ -249,6 +259,10 @@ void InitControls(HWND dlg) {
     for (const wchar_t* name : kPresetNames)
         SendMessageW(combo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
     SendMessageW(combo, CB_SETCUEBANNER, 0, reinterpret_cast<LPARAM>(L"Choose a preset..."));
+
+    HWND posCombo = GetDlgItem(dlg, IDC_POSMODE);
+    for (const wchar_t* name : kPositionNames)
+        SendMessageW(posCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
 
     // Plain keys or Shift+key would hijack normal typing; turn them into Ctrl+Alt+key.
     SendDlgItemMessageW(dlg, IDC_HOTKEY, HKM_SETRULES, HKCOMB_NONE | HKCOMB_S,
@@ -405,6 +419,15 @@ INT_PTR CALLBACK DialogProc(HWND dlg, UINT msg, WPARAM wp, LPARAM lp) {
                     return TRUE;
                 case IDC_OUTLINE_COLOR_BTN:
                     PickColor(dlg, app::Current().outlineColor, IDC_OUTLINE_COLOR_BTN, 1);
+                    return TRUE;
+                case IDC_POSMODE:
+                    if (code == CBN_SELCHANGE && !g_loading) {
+                        const int sel = static_cast<int>(SendDlgItemMessageW(dlg, IDC_POSMODE, CB_GETCURSEL, 0, 0));
+                        if (sel >= 0) {
+                            app::Current().positionMode = sel;
+                            Changed(dlg);
+                        }
+                    }
                     return TRUE;
                 case IDC_PRESET:
                     if (code == CBN_SELCHANGE)

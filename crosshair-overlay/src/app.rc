@@ -79,10 +79,11 @@ BEGIN
     GROUPBOX        "Behavior", IDC_STATIC, 173, 175, 160, 87
     LTEXT           "Toggle hotkey", IDC_HOTKEY_LB, 181, 189, 50, 8
     CONTROL         "", IDC_HOTKEY, "msctls_hotkey32", WS_BORDER | WS_TABSTOP, 232, 187, 94, 12
-    AUTOCHECKBOX    "Hide when the mouse cursor is hidden", IDC_HIDE_CURSOR, 181, 204, 146, 10
-    AUTOCHECKBOX    "Start with Windows", IDC_STARTUP, 181, 218, 146, 10
-    LTEXT           "The crosshair is click-through. Show or hide it with the hotkey or from the tray icon menu.",
-                    IDC_HINT, 181, 234, 146, 24
+    LTEXT           "Crosshair position", IDC_POSMODE_LB, 181, 205, 146, 8
+    COMBOBOX        IDC_POSMODE, 181, 215, 145, 100, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX    "Start with Windows", IDC_STARTUP, 181, 232, 146, 10
+    LTEXT           "Games: use Borderless or Windowed mode.",
+                    IDC_HINT, 181, 247, 146, 10
 
     // ---------------- Bottom row ----------------
     LTEXT           "Preset", IDC_PRESET_LB, 7, 273, 24, 8
@@ -92,8 +93,8 @@ BEGIN
 END
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0x0L
  FILEOS VOS_NT_WINDOWS32
@@ -105,11 +106,11 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "Crosshair Overlay"
-            VALUE "FileVersion", "1.0.0.0"
+            VALUE "FileVersion", "1.1.0.0"
             VALUE "InternalName", "CrosshairOverlay"
             VALUE "OriginalFilename", "CrosshairOverlay.exe"
             VALUE "ProductName", "Crosshair Overlay"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "ProductVersion", "1.1.0.0"
         END
     END
     BLOCK "VarFileInfo"

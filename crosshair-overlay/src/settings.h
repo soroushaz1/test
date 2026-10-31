@@ -3,6 +3,16 @@
 #include <windows.h>
 #include <string>
 
+// Where the crosshair is drawn.
+enum PositionMode : int {
+    kPosAuto = 0,          // follow the mouse; when a game hides the cursor, center of the game window
+    kPosMouse,             // always at the mouse position
+    kPosMouseHide,         // at the mouse position, hidden while the cursor is hidden
+    kPosWindowCenter,      // center of the active (foreground) window
+    kPosScreenCenter,      // center of the screen the active window is on
+    kPosCount
+};
+
 // All user-adjustable options. Sizes are in physical screen pixels.
 struct Settings {
     // Cross lines
@@ -30,12 +40,12 @@ struct Settings {
     COLORREF outlineColor = RGB(0, 0, 0);
     int outlineThickness = 1;
 
-    // Position relative to the mouse hotspot
+    // Fine adjustment, added to the anchor point (mouse or center)
     int offsetX = 0;
     int offsetY = 0;
 
     // Behavior
-    bool hideWhenCursorHidden = false;
+    int positionMode = kPosAuto;
     UINT hotkeyVk = 'X';
     UINT hotkeyMods = MOD_CONTROL | MOD_ALT;   // MOD_* flags
 

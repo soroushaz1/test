@@ -83,6 +83,7 @@ void Settings::Clamp() {
     outlineThickness = std::clamp(outlineThickness, kOutlineMin, kOutlineMax);
     offsetX = std::clamp(offsetX, kOffsetMin, kOffsetMax);
     offsetY = std::clamp(offsetY, kOffsetMin, kOffsetMax);
+    if (positionMode < 0 || positionMode >= kPosCount) positionMode = kPosAuto;
     hotkeyMods &= (MOD_ALT | MOD_CONTROL | MOD_SHIFT | MOD_WIN);
     if (hotkeyVk > 0xFE) hotkeyVk = 0;
 }
@@ -127,7 +128,11 @@ bool LoadSettings(Settings& s) {
     s.offsetX = ReadInt(f, C, L"OffsetX", d.offsetX);
     s.offsetY = ReadInt(f, C, L"OffsetY", d.offsetY);
 
-    s.hideWhenCursorHidden = ReadBool(f, B, L"HideWhenCursorHidden", d.hideWhenCursorHidden);
+    s.positionMode = ReadInt(f, B, L"PositionMode", -1);
+    if (s.positionMode < 0) {
+        // Settings from version 1.0 only had a "hide when the cursor is hidden" switch.
+        s.positionMode = ReadBool(f, B, L"HideWhenCursorHidden", false) ? kPosMouseHide : d.positionMode;
+    }
     s.hotkeyVk = static_cast<UINT>(ReadInt(f, B, L"HotkeyVk", static_cast<int>(d.hotkeyVk)));
     s.hotkeyMods = static_cast<UINT>(ReadInt(f, B, L"HotkeyMods", static_cast<int>(d.hotkeyMods)));
 
@@ -160,7 +165,8 @@ bool SaveSettings(const Settings& s) {
     WriteInt(f, C, L"OffsetX", s.offsetX);
     WriteInt(f, C, L"OffsetY", s.offsetY);
 
-    WriteInt(f, B, L"HideWhenCursorHidden", s.hideWhenCursorHidden);
+    WriteInt(f, B, L"PositionMode", s.positionMode);
+    WritePrivateProfileStringW(B, L"HideWhenCursorHidden", nullptr, f.c_str());   // replaced by PositionMode
     WriteInt(f, B, L"HotkeyVk", static_cast<int>(s.hotkeyVk));
     WriteInt(f, B, L"HotkeyMods", static_cast<int>(s.hotkeyMods));
 

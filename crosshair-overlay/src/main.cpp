@@ -28,6 +28,7 @@ constexpr int kHotkeyId = 1;
 constexpr UINT_PTR kTimerTrack = 1;     // fallback while a modal loop (menu, drag) runs
 constexpr UINT kTrackFallbackMs = 10;
 constexpr UINT_PTR kTimerTopmost = 2;   // keep the overlay above other topmost windows
+constexpr UINT kTopmostIntervalMs = 250;
 constexpr UINT_PTR kTimerTrayRetry = 3; // the taskbar may not exist yet at logon
 
 enum MenuId : UINT { IDM_TOGGLE = 40001, IDM_SETTINGS, IDM_STARTUP, IDM_EXIT };
@@ -48,6 +49,7 @@ int g_modalDepth = 0;
 HANDLE g_pollTimer = nullptr;
 bool g_pollTimerHighRes = false;
 HICON g_iconOn = nullptr, g_iconOff = nullptr, g_iconLarge = nullptr;
+HWINEVENTHOOK g_foregroundHook = nullptr;
 
 HICON LoadAppIcon(int id, int size) {
     return static_cast<HICON>(LoadImageW(g_instance, MAKEINTRESOURCEW(id), IMAGE_ICON, size, size, LR_DEFAULTCOLOR));
@@ -173,6 +175,14 @@ void PollCursor() {
     }
 }
 
+// When another window comes to the front (e.g. a game starts or gets focus),
+// re-raise the overlay right away instead of waiting for the timer: games
+// often make their own window topmost when activated.
+void CALLBACK OnForegroundChanged(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWORD) {
+    g_overlay.ForceTopmost();
+    PollCursor();
+}
+
 void SetCrosshairEnabled(bool enabled) {
     g_overlay.SetEnabled(enabled);
     UpdatePolling();
@@ -227,7 +237,7 @@ void ShowTrayMenu(POINT pt) {
 LRESULT CALLBACK MainProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
         case WM_CREATE:
-            SetTimer(hwnd, kTimerTopmost, 500, nullptr);
+            SetTimer(hwnd, kTimerTopmost, kTopmostIntervalMs, nullptr);
             return 0;
 
         case WM_TIMER:
@@ -264,6 +274,8 @@ LRESULT CALLBACK MainProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             return 0;
 
         case WM_DESTROY:
+            if (g_foregroundHook) UnhookWinEvent(g_foregroundHook);
+            g_foregroundHook = nullptr;
             CloseSettingsDialog();
             KillTimer(hwnd, kTimerTrack);
             KillTimer(hwnd, kTimerTopmost);
@@ -394,6 +406,8 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
     }
 
     CreatePollTimer();
+    g_foregroundHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr, OnForegroundChanged,
+                                       0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
     g_overlay.Apply(g_settings);
     SetCrosshairEnabled(true);
     AddTrayIcon();

@@ -24,7 +24,6 @@
 #define IDC_DOT_ROUND 1013
 #define IDC_SHOW_CIRCLE 1014
 #define IDC_OUTLINE 1015
-#define IDC_HIDE_CURSOR 1016
 #define IDC_STARTUP 1017
 
 // Other controls
@@ -37,6 +36,8 @@
 #define IDC_PRESET 1033
 #define IDC_PRESET_LB 1034
 #define IDC_HINT 1035
+#define IDC_POSMODE 1036
+#define IDC_POSMODE_LB 1037
 
 #ifndef IDC_STATIC
 #define IDC_STATIC (-1)
